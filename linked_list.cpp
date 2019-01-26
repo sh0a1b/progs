@@ -243,6 +243,55 @@ struct node* ShuffleMerge(struct node* a, struct node* b) {
    }
    return head;
 }
+
+struct node* SortedMerge(struct node* a, struct node* b) {
+    struct node* head = a, *temp_node, *cur;
+
+    if (!a) {
+        return b;
+    } else if (!b) {
+        return a;
+    }
+
+    /* add each element in head ptr */
+    if (a->data <= b->data) {
+        head = a;
+        a = a->next;
+    } else {
+        head = b;
+        b = b->next;
+    }
+    cur = head;
+    while (a && b) {
+        if (a->data <= b->data) {
+            cur->next = a;
+            a = a->next;
+        } else {
+            cur->next = b;
+            b = b->next;
+        }
+        cur = cur->next;
+    }
+    if (a) {
+        cur->next = a;
+    }
+    if (b) {
+        cur->next = b;
+    }
+    return head;
+}
+void MergeSort(struct node** headRef) {
+    struct node *front = NULL, *back = NULL;
+    if ((*headRef)->next == NULL) {
+        return;
+    }
+    FrontBackSplit((*headRef), &front, &back);
+    MergeSort(&front);
+    MergeSort(&back);
+    /* important that you change the headRef, test for list: 12345472 */
+    (*headRef) = SortedMerge(front, back);
+}
+
 int main() {
     struct node* head = NULL, *head1 = NULL;
     struct node *front = NULL, *back = NULL;
@@ -275,6 +324,8 @@ int main() {
     MoveNode(&head, &head1);
     AlternatingSplit(head, &front, &back);
     front = ShuffleMerge(head, head1);
+    front = SortedMerge(head, head1);
+    MergeSort(&head);
 */
     printList(head);
     printList(head1);
