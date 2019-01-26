@@ -292,6 +292,67 @@ void MergeSort(struct node** headRef) {
     (*headRef) = SortedMerge(front, back);
 }
 
+struct node* SortedIntersect(struct node* a, struct node* b) {
+    if (!a || !b) {
+        return NULL;
+    }
+    /* start of the new list */
+    struct node* head = NULL;
+    struct node** headRef = &head;
+    while (a && b) {
+        if (a->data == b->data) {
+            Push(headRef, a->data);
+            headRef = &((*headRef)->next);
+            a = a->next;
+            b = b->next;
+        } else if (a->data < b->data) {
+            a = a->next;
+        } else {
+            b = b->next;
+        }
+    }
+    return head;
+}
+
+void Reverse(struct node** headRef) {
+    struct node *cur = NULL, *front = NULL, *prev = NULL;
+
+    cur = (*headRef);
+    while(cur) {
+        front = cur->next;
+        cur->next = prev;
+        prev = cur;
+        if (!front) {
+            /* last node should be made head */
+            break;
+        }
+        cur = front;
+    }
+    /* didnt work if, headRef = &cur; because '*headRef' is head which still points to first element
+     * we pass reference parameter to change the head pointer, so modify '*headRef' */
+    (*headRef) = cur;
+}
+
+void RecursiveReverse(struct node** headRef) {
+    static struct node* prev_node = NULL, *head_node = NULL;
+    struct node* next_node = NULL;
+
+    if ((*headRef) == NULL) {
+        return;
+    }
+    if ((*headRef)->next == NULL) {
+        /* when its the last node, store it in head_node to modify the headRef at end */
+        head_node = (*headRef);
+    }
+    next_node = (*headRef)->next;
+    (*headRef)->next = prev_node;
+    prev_node = (*headRef);
+
+    RecursiveReverse(&next_node);
+    /* very important, modify the headRef to point to head_node */
+    (*headRef) = head_node;
+}
+
 int main() {
     struct node* head = NULL, *head1 = NULL;
     struct node *front = NULL, *back = NULL;
@@ -326,6 +387,9 @@ int main() {
     front = ShuffleMerge(head, head1);
     front = SortedMerge(head, head1);
     MergeSort(&head);
+    front = SortedIntersect(head, head1);
+    Reverse(&head);
+    RecursiveReverse(&head);
 */
     printList(head);
     printList(head1);
